@@ -35,7 +35,7 @@ class StdinSource:
 
         def get_tasks(self) -> Iterable[Task]:
             for line_num, line in enumerate(self.stream, start=1):
-                fields = line.split(";")
+                fields = line.strip().split(";")
                 if not line.strip():
                     continue
                 (
