@@ -18,6 +18,7 @@ from src.contracts.task import Task
 
 @dataclass()
 class TaskGenerator:
+    """TaskGenerator class for creating random Tasks"""
     name: str = "TaskGenerator"
 
     def __init__(

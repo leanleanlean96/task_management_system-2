@@ -22,6 +22,7 @@ def parse_json_file(path: Path) -> list[dict[str, Any]]:
 
 @dataclass(frozen=True)
 class JsonSource:
+    """Reads Tasks from Path/to.jsonl"""
     path: Path
     name: str = "Jsonfile"
 

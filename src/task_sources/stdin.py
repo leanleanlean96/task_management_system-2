@@ -10,6 +10,7 @@ from src.contracts.task import Task
 def extract_task_fields(
     fields: list[str], line_num: int
 ) -> tuple[str, str, str, bool, datetime, datetime]:
+    """Extracts fields for class construction from STDin"""
     try:
         return (
             fields[0],
@@ -27,6 +28,7 @@ def extract_task_fields(
 
 @dataclass(frozen=True)
 class StdinSource:
+    """Source for stdin task input"""
     stream: TextIO = sys.stdin
     name: str = "stdin"
     try:

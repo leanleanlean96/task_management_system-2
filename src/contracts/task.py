@@ -5,6 +5,7 @@ from datetime import datetime
 
 @dataclass(slots=True)
 class Task:
+    """Base class for Tasks"""
     id: str
     name: str
     description: str
