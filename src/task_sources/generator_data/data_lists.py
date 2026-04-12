@@ -1,32 +1,33 @@
 from datetime import datetime
 
 name_list: list[str] = [
-    "Fix bug in login module",
-    "Add dark mode toggle",
-    "Write unit tests",
-    "Refactor auth service",
-    "Update documentation",
+    "Clear the goblin ambush",
+    "Deliver the sealed letter",
+    "Investigate the haunted crypt",
+    "Escort the merchant caravan",
+    "Retrieve the stolen relic",
 ]
 
 description_list: list[str] = [
-    "Fix email validation bug in login flow.",
-    "Implement user‑facing dark mode switch.",
-    "Add pytest suite for payment module.",
-    "Move authentication logic into a dedicated service.",
-    "Update README and API docs after refactor.",
+    "Travel to the location, deal with any threats, and report back to the quest giver.",
+    "Venture into hostile territory and complete the task before nightfall.",
+    "Gather your party, prepare supplies, and see the contract through to its end.",
+    "Accept the commission from the guild and return once the work is done.",
+    "Handle the matter discreetly and bring proof of completion to claim the reward.",
 ]
 
 creation_date_list: list[datetime] = [
     datetime(2026, 3, 1, 10, 0),
-    datetime(2026, 3, 5, 14, 30),
-    datetime(2026, 3, 8, 9, 15),
-    datetime(2026, 3, 12, 16, 20),
-    datetime(2026, 3, 18, 11, 45),
+    datetime(2026, 3, 1, 11, 0),
+    datetime(2026, 3, 1, 12, 0),
+    datetime(2026, 3, 1, 13, 0),
+    datetime(2026, 3, 1, 14, 0),
 ]
 
-completion_date_list: list[datetime] = [
-    datetime(2026, 3, 2, 15, 0),
-    datetime(2026, 3, 6, 18, 0),
-    datetime(2026, 3, 9, 12, 30),
-    datetime(2026, 3, 13, 17, 45),
+completion_date_list: list[datetime | None] = [
+    datetime(2026, 3, 10, 9, 0),
+    datetime(2026, 3, 12, 15, 0),
+    datetime(2026, 3, 15, 10, 0),
+    datetime(2026, 3, 20, 17, 0),
+    None,
 ]

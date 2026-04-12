@@ -5,54 +5,48 @@ from datetime import datetime
 from typing import TextIO
 
 from src.contracts.task import Task
-
-
-def extract_task_fields(
-    fields: list[str], line_num: int
-) -> tuple[str, str, str, bool, datetime, datetime]:
-    """Extracts fields for class construction from STDin"""
-    try:
-        return (
-            fields[0],
-            fields[1],
-            fields[2],
-            fields[3].lower() in ("true", "1", "yes", "y"),
-            datetime.fromisoformat(fields[4]),
-            datetime.fromisoformat(fields[5]),
-        )
-    except IndexError:
-        raise ValueError(
-            f"Line: {line_num}. Task must contain at least 6 valid parameters, separated by ';'"
-        )
+from src.contracts.exceptions.task_exceptions import TaskError, InvalidTaskData
 
 
 @dataclass(frozen=True)
 class StdinSource:
-    """Source for stdin task input"""
+    """Reads new Tasks from a text stream (default is stdin).
+
+    Expected format per line, ';'-separated:
+        title;description;priority[;creation_date[;completion_date]]
+    """
+
     stream: TextIO = sys.stdin
     name: str = "stdin"
-    try:
 
-        def get_tasks(self) -> Iterable[Task]:
-            for line_num, line in enumerate(self.stream, start=1):
-                fields = line.strip().split(";")
-                if not line.strip():
-                    continue
-                (
-                    task_id,
-                    task_name,
-                    task_desc,
-                    is_completed,
-                    creation_date,
-                    completion_date,
-                ) = extract_task_fields(fields, line_num)
-                yield Task(
-                    id=task_id,
-                    name=task_name,
-                    description=task_desc,
-                    is_completed=is_completed,
-                    creation_date=creation_date,
-                    completion_date=completion_date,
-                )
-    except Exception as e:
-        print("An error occured: {e}")
+    def get_tasks(self) -> Iterable[Task]:
+        for line_num, line in enumerate(self.stream, start=1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            try:
+                yield _parse_and_create(stripped)
+            except TaskError as e:
+                print(f"Skipping task at line {line_num}: {e}")
+
+
+def _parse_and_create(line: str) -> Task:
+    try:
+        fields = [f.strip() for f in line.split(";")]
+        title = fields[0]
+        desc = fields[1]
+        priority = int(fields[2])
+        creation_date = datetime.fromisoformat(fields[3]) if len(fields) >= 4 else None
+        completion_date = datetime.fromisoformat(fields[4]) if len(fields) >= 5 else None
+    except IndexError as e:
+        raise InvalidTaskData("Task must at least have title, description, priority to be created from stdin") from e
+    except ValueError as e:
+        raise InvalidTaskData("Invalid datetime format")
+
+    return Task.create(
+        title=title,
+        description=desc,
+        priority=priority,
+        creation_date=creation_date,
+        completion_date=completion_date,
+    )

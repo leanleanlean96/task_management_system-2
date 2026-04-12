@@ -6,16 +6,6 @@ from uuid import uuid4
 
 from src.contracts.task import Task
 
-"""
-    self.id = id
-    self.name = name
-    self.description = description
-    self.is_completed = is_completed
-    self.creation_date = creation_date
-    self.completion_date = completion_date
-"""
-
-
 @dataclass()
 class TaskGenerator:
     """TaskGenerator class for creating random Tasks"""
@@ -36,12 +26,15 @@ class TaskGenerator:
     def get_tasks(self) -> Iterable[Task]:
         random.seed()
         for i in range(random.randint(1, 33)):
-            id = str(uuid4())
             name = random.choice(self.name_list)
             desc = random.choice(self.description_list)
-            is_completed = random.choice([True, False])
+            priority = random.randint(1, 5)
             cr_date = random.choice(self.creation_date_list)
-            completion_date = (
-                None if not is_completed else random.choice(self.completion_date_list)
+            completion_date = random.choice(self.completion_date_list)
+            yield Task.create(
+                title=name,
+                description=desc,
+                priority=priority,
+                creation_date=cr_date,
+                completion_date=completion_date,
             )
-            yield Task(id, name, desc, is_completed, cr_date, completion_date)
