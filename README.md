@@ -54,9 +54,11 @@ title;description;priority[;creation_date[;completion_date]]
 - Dates are ISO 8601.
 - `id` is generated automatically — users don't supply it.
 
+### Generated with in-build command
+
+Tasks can be generated with in-build TaskGenerator class (see below)
+
 ---
-
-
 
 ## Examples
 
