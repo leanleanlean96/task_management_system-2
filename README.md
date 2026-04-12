@@ -134,10 +134,12 @@ completed at: 2026-03-22 17:30:00
 ----------------------------------------
 ```
 
+### Generating tasks with TaskGenerator
+
 Command:
 
 ```bash
-
+poetry run python -m src.main read --gen
 ```
 
 Output:
