@@ -194,7 +194,7 @@ Clear the goblin ambush;Handle the raiders.;2;2026-03-25T10:00:00;2026-03-24T10:
 
 
 ## Dependencies
-This project uses poetry for dependencies management, so you must have it installed
+This project uses poetry for dependencies management, so you must have it installed.
 Install dependencies:
 
 ```bash
