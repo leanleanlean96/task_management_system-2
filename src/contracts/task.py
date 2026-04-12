@@ -4,14 +4,19 @@ from uuid import uuid4
 
 from .descriptors.datetime_field import DateField
 from .descriptors.id_field import IdField
-from .descriptors.str_field import StringField
 from .descriptors.priority_field import PriorityField
 from .descriptors.short_id import ShortIdField
+from .descriptors.str_field import StringField
+from .exceptions.task_exceptions import (
+    AccessPermitted,
+    InvalidTaskData,
+    InvalidTaskFieldValue,
+)
 
-from .exceptions.task_exceptions import InvalidTaskData, AccessPermitted, InvalidTaskFieldValue
 
 class Task:
     """Base class for Tasks"""
+
     id: str = IdField()
     short_id: str = ShortIdField()
     title: str = StringField()
@@ -30,16 +35,16 @@ class Task:
         creation_date: datetime,
         completion_date: Optional[datetime] = None,
     ) -> None:
-        
+
         if creation_date is None:
             creation_date = datetime.now(timezone.utc)
         if completion_date is not None and creation_date > completion_date:
             raise InvalidTaskData("Task is completed before it is created")
-        
+
         self.id = id
         self.title = title
         self.description = description
-        self.priority= priority
+        self.priority = priority
         self.creation_date = creation_date
         self.completion_date = completion_date
 
@@ -72,7 +77,7 @@ class Task:
         creation_date: Optional[datetime] = None,
         completion_date: Optional[datetime] = None,
     ) -> Self:
-        
+
         return cls(
             id=str(uuid4()),
             title=title,
@@ -90,7 +95,7 @@ class Task:
         if comp_date < self.creation_date:
             raise InvalidTaskData("completion_date can't be before creation_date")
         self.completion_date = comp_date
-    
+
     @property
     def is_completed(self) -> str:
         return "Completed" if self.completion_date is not None else "Not Completed"

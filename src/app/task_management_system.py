@@ -6,6 +6,7 @@ from src.contracts.task_source import TaskSource
 
 class TaskManagementSystem:
     """Task Management system class for managing tasks"""
+
     def __init__(self, task_sources: Sequence[TaskSource]) -> None:
         self.task_sources = task_sources or []
 

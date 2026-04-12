@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import TextIO
 
+from src.contracts.exceptions.task_exceptions import InvalidTaskData, TaskError
 from src.contracts.task import Task
-from src.contracts.exceptions.task_exceptions import TaskError, InvalidTaskData
 
 
 @dataclass(frozen=True)
@@ -37,9 +37,13 @@ def _parse_and_create(line: str) -> Task:
         desc = fields[1]
         priority = int(fields[2])
         creation_date = datetime.fromisoformat(fields[3]) if len(fields) >= 4 else None
-        completion_date = datetime.fromisoformat(fields[4]) if len(fields) >= 5 else None
+        completion_date = (
+            datetime.fromisoformat(fields[4]) if len(fields) >= 5 else None
+        )
     except IndexError as e:
-        raise InvalidTaskData("Task must at least have title, description, priority to be created from stdin") from e
+        raise InvalidTaskData(
+            "Task must at least have title, description, priority to be created from stdin"
+        ) from e
     except ValueError as e:
         raise InvalidTaskData("Invalid datetime format")
 

@@ -1,6 +1,7 @@
 from typing import Any
 from uuid import UUID
-from ..exceptions.task_exceptions import InvalidTaskFieldValue, AccessPermitted
+
+from ..exceptions.task_exceptions import AccessPermitted, InvalidTaskFieldValue
 
 
 class IdField:

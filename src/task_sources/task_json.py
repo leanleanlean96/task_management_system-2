@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from src.contracts.task import Task
 from src.contracts.exceptions.task_exceptions import TaskError
+from src.contracts.task import Task
 
 
 def parse_jsonl(path: Path) -> Iterator[tuple[int, dict[str, Any]]]:

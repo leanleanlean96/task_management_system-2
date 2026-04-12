@@ -7,6 +7,7 @@ from .task import Task
 @runtime_checkable
 class TaskSource(Protocol):
     """TaskSource protocol"""
+
     name: str
 
     def get_tasks(self) -> Iterable[Task]: ...
