@@ -56,7 +56,7 @@ title;description;priority[;creation_date[;completion_date]]
 
 ---
 
-### Generated with in-build command
+
 
 ## Examples
 
