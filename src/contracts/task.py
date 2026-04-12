@@ -64,7 +64,7 @@ class Task:
             )
         except KeyError as e:
             raise InvalidTaskData(f"Missing required field: {e.args[0]}") from e
-        except ValueError as e:
+        except (ValueError, TypeError) as e:
             raise InvalidTaskFieldValue(f"Invalid field value: {e}") from e
 
     @classmethod
