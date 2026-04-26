@@ -65,15 +65,22 @@ def read(
     raw_sources = _build_sources(stdin, generator, jsonl)
     inbox = TaskManagementSystem(raw_sources)
     numbers = 0
-    for task in inbox.iter_tasks():
-        task_completed = 1 if task.is_completed == "Completed" else 0
-        if priority is not None and task.priority != priority:
-            typer.echo("No tasks match the specified priority.")
-            continue
-        if completed is not None and task_completed != completed:
-            typer.echo("No tasks match the specified completion status.")
-            continue
+    if priority is not None:
+        iterator = inbox.iter_tasks_by_priority(priority)
+    elif completed is not None:
+        status_str = "Completed" if completed == 1 else "Not Completed"
+        iterator = inbox.iter_completed_tasks(status_str)
+    else:
+        iterator = inbox.iter_tasks()
+
+    numbers = 0
+    for task in iterator:
         numbers += 1
         typer.echo(str(task))
+
+    if numbers == 0:
+        typer.echo("No tasks match the specified filters.")
+    else:
+        typer.echo(f"\nTotal: {numbers}")
 
     typer.echo(f"\nTotal: {numbers}")
