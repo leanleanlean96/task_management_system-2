@@ -1,7 +1,5 @@
 # Task Management Platform
 
-A highly efficient, iterator-based task management platform demonstrating encapsulation, domain model invariant protection, and lazy evaluation pipelines. 
-
 Tasks can be loaded from multiple concurrent sources (JSONL files, stdin, or in-memory generators), validated via custom descriptors, lazily filtered without memory duplication, and printed to the terminal.
 
 ---
@@ -76,7 +74,6 @@ poetry run python -m src.main read --stdin
 
 ### Lazy Filtering
 
-The platform utilizes a custom Iterator state-machine and chained Generators to filter tasks with **zero memory overhead**. 
 
 Filter tasks by a specific priority (1-5):
 ```bash
