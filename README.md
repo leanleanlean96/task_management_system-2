@@ -1,9 +1,8 @@
 # Task Management Platform
 
-A small task-management platform demonstrating encapsulation and invariant
-protection in a domain model. Tasks can be loaded from JSONL files or piped in
-over stdin, validated via custom descriptors and `@property`, and printed to
-the terminal.
+A highly efficient, iterator-based task management platform demonstrating encapsulation, domain model invariant protection, and lazy evaluation pipelines. 
+
+Tasks can be loaded from multiple concurrent sources (JSONL files, stdin, or in-memory generators), validated via custom descriptors, lazily filtered without memory duplication, and printed to the terminal.
 
 ---
 
@@ -19,21 +18,22 @@ class Task:
     completion_date: datetime | None  # None for uncompleted tasks
 
     short_id: str                     # first 8 chars of id
-    is_completed: bool                # True when completion_date is set
-    status: Literal["Created", "Completed"]
+    is_completed: str                 # "Completed" if completion_date is set, else "Not Completed"
 ```
 
 Invariants enforced on every construction path:
 
 - `completion_date`, when set, must not precede `creation_date`.
+- Identifiers (`id`) are strictly validated as actual UUIDs.
+- `priority` must be an integer between 1 and 5.
 
 ---
 
 ## Input formats
 
-Tasks can be loaded from 3 sources.
+The system can read and merge tasks from 3 different sources simultaneously. All sources stream data dynamically into a unified Task Queue.
 
-### JSONL file (`--jsonl PATH`)
+### 1. JSONL file (`--jsonl PATH`)
 
 One JSON object per line, matching the fields above:
 
@@ -41,11 +41,11 @@ One JSON object per line, matching the fields above:
 {"id": "c9b1e4a2-3f8a-4b7d-8e1c-5f9a2b8c7d6e", "title": "Scout the dragon's lair", "description": "Map the entrances from the ridge.", "priority": 3, "creation_date": "2026-03-23T20:15:00", "completion_date": null}
 ```
 
-### Stdin (`--stdin`)
+### 2. Stdin (`--stdin`)
 
 One task per line, `;`-separated:
 
-```
+```text
 title;description;priority[;creation_date[;completion_date]]
 ```
 
@@ -54,54 +54,67 @@ title;description;priority[;creation_date[;completion_date]]
 - Dates are ISO 8601.
 - `id` is generated automatically — users don't supply it.
 
-### Generated with in-build command
+### 3. Generated with in-build command (`--gen`)
 
-Tasks can be generated with in-build TaskGenerator class (see below)
+Tasks can be dynamically generated with random properties using the built-in `TaskGenerator` class.
+
+---
+
+## Command Line Usage
+
+### Basic Reading (Unified Stream)
+
+Read tasks from a JSONL file:
+```bash
+poetry run python -m src.main read --jsonl tasks.jsonl
+```
+
+Read tasks from stdin:
+```bash
+poetry run python -m src.main read --stdin
+```
+
+### Lazy Filtering
+
+The platform utilizes a custom Iterator state-machine and chained Generators to filter tasks with **zero memory overhead**. 
+
+Filter tasks by a specific priority (1-5):
+```bash
+poetry run python -m src.main read --gen --priority 3
+```
+
+Filter tasks by completion status (1 for Completed, 0 for Not Completed):
+```bash
+poetry run python -m src.main read --jsonl tasks.jsonl --completed 1
+```
 
 ---
 
 ## Examples
 
-### Loading from JSONL
-
-Input file `tasks.jsonl`:
-
-```jsonl
-{"id":"c9b1e4a2-3f8a-4b7d-8e1c-5f9a2b8c7d6e","title":"Scout the dragon's lair","description":"Map the entrances from the ridge.","priority":3,"creation_date":"2026-03-23T20:15:00","completion_date":null}
-{"id":"a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d","title":"Broker peace with the druids","description":"Meet the grove's emissary at the standing stones.","priority":2,"creation_date":"2026-03-23T19:30:00","completion_date":"2026-03-23T19:45:00"}
-{"id":"b2c3d4e5-6f7a-4b8c-9d0e-1f2a3b4c5d6e","title":"Cleanse the cursed well","description":"Descend into the old village well.","priority":2,"creation_date":"2026-03-23T21:00:00","completion_date":"2026-03-23T20:00:00"}
-```
+### Using filters on generated tasks
 
 Command:
 
 ```bash
-poetry run python -m src.main read --jsonl tasks.jsonl
+poetry run python -m src.main read --gen --priority 5
 ```
 
 Output:
 
-```
+```text
 ----------------------------------------
-Task: Scout the dragon's lair
-short_id: c9b1e4a2
-description: Map the entrances from the ridge.
-status: Not Completed
-created at: 2026-03-23 20:15:00
-completed at: None
-----------------------------------------
-----------------------------------------
-Task: Broker peace with the druids
-short_id: a1b2c3d4
-description: Meet the grove's emissary at the standing stones.
+Task: Retrieve the stolen relic
+short_id: 8387a751
+description: Handle the matter discreetly and bring proof of completion to claim the reward.
 status: Completed
-created at: 2026-03-23 19:30:00
-completed at: 2026-03-23 19:45:00
+priority: 5
+created at: 2026-03-01 11:00:00
+completed at: 2026-03-20 17:00:00
 ----------------------------------------
-Skipping task at line 3: completion_date can't be before creation_date
-```
 
-The third record violates the ordering invariant and is skipped; the loader
-continues normally.
+Total: 1
+```
 
 ### Loading from stdin
 
@@ -112,19 +125,20 @@ poetry run python -m src.main read --stdin
 ```
 Input:
 
-```
+```text
 Retrieve the stolen relic;Recover the temple relic from the bandit camp.;3
 Cleanse the cursed well;Descend and destroy the taint.;4;2026-03-20T09:00:00;2026-03-22T17:30:00
 ```
 
 Output:
 
-```
+```text
 ----------------------------------------
 Task: Retrieve the stolen relic
 short_id: 7f3a2b1c
 description: Recover the temple relic from the bandit camp.
 status: Not Completed
+priority: 3
 created at: 2026-04-12 13:16:42.367941+00:00
 completed at: None
 ----------------------------------------
@@ -133,70 +147,44 @@ Task: Cleanse the cursed well
 short_id: 4d8e9a01
 description: Descend and destroy the taint.
 status: Completed
+priority: 4
 created at: 2026-03-20 09:00:00
 completed at: 2026-03-22 17:30:00
-----------------------------------------
-```
-
-### Generating tasks with TaskGenerator
-
-Command:
-
-```bash
-poetry run python -m src.main read --gen
-```
-
-Output:
-
-```
-----------------------------------------
-Task: Clear the goblin ambush
-short_id: 1fa11571
-description: Gather your party, prepare supplies, and see the contract through to its end.
-status: Completed
-priority: 4
-created at: 2026-03-01 11:00:00
-completed at: 2026-03-12 15:00:00
-----------------------------------------
-----------------------------------------
-Task: Clear the goblin ambush
-short_id: 8387a751
-description: Accept the commission from the guild and return once the work is done.
-status: Completed
-priority: 5
-created at: 2026-03-01 11:00:00
-completed at: 2026-03-20 17:00:00
 ----------------------------------------
 
 Total: 2
 ```
+
 ### Error handling
 
-Malformed inputs are skipped with an informative message, not fatal.
+Malformed inputs are skipped with an informative message, and the iterator continues seamlessly to the next task.
 
-```
+```text
 ;;3
 ```
 → `Skipping task at line 1: title must not be empty`
 
-```
-Scout the dragon's lair;Map the ridge.;abc
-```
-→ `Skipping task at line 1: invalid literal for int() with base 10: 'abc'`
-
-```
+```text
 Clear the goblin ambush;Handle the raiders.;2;2026-03-25T10:00:00;2026-03-24T10:00:00
 ```
 → `Skipping task at line 1: completion_date can't be before creation_date`
 
+```json
+{"id": "not-a-uuid", "title": "Test", "creation_date": "2026-03-23T10:00:00"}
+```
+→ `Skipping task at line 1: id must be a valid UUID, got not-a-uuid`
+
 ---
 
-
-
 ## Dependencies
-This project uses poetry for dependencies management, so you must have it installed.
+This project uses `poetry` for dependencies management, so you must have it installed.
 Install dependencies:
 
 ```bash
 poetry install
+```
+
+Run tests:
+```bash
+poetry run pytest
 ```
