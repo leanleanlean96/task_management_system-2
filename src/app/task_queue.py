@@ -2,7 +2,6 @@ from collections.abc import Sequence
 from collections.abc import Iterable
 
 from src.contracts.task_source import TaskSource
-from .task_queue_iterator import TaskQueueIterator
 from src.contracts.task import Task
 
 class TaskQueueIterator:
