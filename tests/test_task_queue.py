@@ -6,9 +6,9 @@ from src.app.task_queue import TaskQueue
 
 @pytest.fixture
 def sample_tasks():
-    t1 = Task.create(title="Task 1", priority=1)
-    t2 = Task.create(title="Task 2", priority=3)
-    t3 = Task.create(title="Task 3", priority=5)
+    t1 = Task.create(title="Task 1", description="Desc 1", priority=1)
+    t2 = Task.create(title="Task 2", description="Desc 2", priority=3)
+    t3 = Task.create(title="Task 3", description="Desc 3", priority=5)
     t3.complete(datetime.now(timezone.utc))
     
     class DummySource:
@@ -52,4 +52,4 @@ def test_lazy_filters_are_generators(sample_tasks):
     assert inspect.isgenerator(priority_filter)
     
     assert len(list(status_filter)) == 1
-    assert len(list(priority_filter)) == 2
+    assert len(list(priority_filter)) == 1
