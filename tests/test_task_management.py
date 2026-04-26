@@ -6,12 +6,12 @@ from src.contracts.task_source import TaskSource
 
 def test_init_empty_sources():
     system = TaskManagementSystem([])
-    assert system.task_sources == []
+    assert system.task_queue.task_sources == []
 
 
 def test_init_with_sources(mock_task_source: TaskSource):
     system = TaskManagementSystem([mock_task_source])
-    assert len(system.task_sources) == 1
+    assert len(system.task_queue.task_sources) == 1
 
 
 def test_iter_tasks_empty():
@@ -27,6 +27,5 @@ def test_iter_tasks_valid_source(mock_task_source: TaskSource, mock_tasks):
 
 
 def test_iter_tasks_invalid_source():
-    system = TaskManagementSystem(["not a TaskSource"])
     with pytest.raises(TypeError, match="not a valid TaskSource"):
-        list(system.iter_tasks())
+        TaskManagementSystem(["not a TaskSource"])

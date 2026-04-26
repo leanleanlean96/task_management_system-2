@@ -1,4 +1,5 @@
-from datetime import datetime
+import uuid
+from datetime import datetime, timezone
 from unittest.mock import Mock
 
 import pytest
@@ -9,7 +10,17 @@ from src.contracts.task_source import TaskSource
 
 @pytest.fixture
 def mock_tasks():
-    return [Task("1", "Test", "Desc", True, datetime.now(), datetime.now())]
+    id = str(uuid.uuid4())
+    return [
+        Task(
+            id=id, 
+            title="Test", 
+            description="Desc", 
+            priority=1, 
+            creation_date=datetime.now(timezone.utc), 
+            completion_date=datetime.now(timezone.utc)
+        )
+    ]
 
 
 @pytest.fixture
