@@ -49,11 +49,30 @@ def read(
         dir_okay=False,
         readable=True,
     ),
+    priority: Optional[int] = typer.Option(
+        None,
+        "--priority",
+        help="Filter tasks by priority (1-5)",
+        min=1,
+        max=5,
+    ),
+    completed: Optional[int] = typer.Option(
+        None,
+        "--completed",
+        help="Filter tasks to show only completed ones",
+    ),
 ):
     raw_sources = _build_sources(stdin, generator, jsonl)
     inbox = TaskManagementSystem(raw_sources)
     numbers = 0
     for task in inbox.iter_tasks():
+        task_completed = 1 if task.is_completed == "Completed" else 0
+        if priority is not None and task.priority != priority:
+            typer.echo("No tasks match the specified priority.")
+            continue
+        if completed is not None and task_completed != completed:
+            typer.echo("No tasks match the specified completion status.")
+            continue
         numbers += 1
         typer.echo(str(task))
 
