@@ -1,8 +1,8 @@
-from collections.abc import Sequence
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 
-from src.contracts.task_source import TaskSource
 from src.contracts.task import Task
+from src.contracts.task_source import TaskSource
+
 
 class TaskQueueIterator:
     def __init__(self, task_sources: Sequence[TaskSource]) -> None:

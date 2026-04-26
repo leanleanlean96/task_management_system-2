@@ -1,8 +1,11 @@
 import inspect
-import pytest
 from datetime import datetime, timezone
-from src.contracts.task import Task
+
+import pytest
+
 from src.app.task_queue import TaskQueue
+from src.contracts.task import Task
+
 
 @pytest.fixture
 def sample_tasks():

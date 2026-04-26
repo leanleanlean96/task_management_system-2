@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from src.task_sources.stdin import _parse_and_create
 from src.contracts.exceptions.task_exceptions import InvalidTaskData
+from src.task_sources.stdin import _parse_and_create
 
 
 def test_parse_and_create_valid():
