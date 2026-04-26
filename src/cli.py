@@ -82,5 +82,3 @@ def read(
         typer.echo("No tasks match the specified filters.")
     else:
         typer.echo(f"\nTotal: {numbers}")
-
-    typer.echo(f"\nTotal: {numbers}")
